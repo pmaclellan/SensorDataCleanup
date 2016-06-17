@@ -15,11 +15,11 @@ import csv
 # @assumption: The CSV file contains a single column of Float values.
 
 if (len(sys.argv) < 3):
-	print "usage: python cleanup.py <filename.csv> <# peaks>"
+	print "usage: python cleanup.py <filepath> <# peaks>"
 	exit()
 
-filename = sys.argv[1]
-data = csv.reader(open(filename, 'rb'), delimiter=",", quotechar='|')
+filepath = sys.argv[1]
+data = csv.reader(open(filepath, 'rb'), delimiter=",", quotechar='|')
 num_peaks = int(sys.argv[2])
 
 sensor_data = []
@@ -125,7 +125,7 @@ for sub in sublists:
 		if peak_count > num_peaks - 1:
 			break
 
-	print "Sample Set " + str(index) + ". Maximums: " + str(local_maxes)
+	print "Sample Set " + str(index) + ". \nMaximums: " + str(local_maxes)
 	index += 1
 
 # -----------
@@ -143,6 +143,17 @@ for i in range(longest):
 		sub_result.append(0 if len(sublists[j]) <= i else sublists[j][i])
 	finalresult.append(sub_result)
 
-f = open('output_' + filename, 'w+b')
+if '/' in filepath:
+	subpaths = filepath.split('/')
+	subpaths[-1] = 'output_' + subpaths[-1]
+elif '\\' in filepath:
+	subpaths = filepath.split('\\')
+	subpaths[-1] = 'output_' + subpaths[-1]
+
+filepath = '/'.join(subpaths)
+
+f = open(filepath, 'w+b')
 writer = csv.writer(f)
 writer.writerows(finalresult)
+
+print 'Success! \nOutput file path: ' + filepath
