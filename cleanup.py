@@ -67,7 +67,7 @@ for reading in sensor_data:
 	else:
 		reading -= local_min
 		reading *= -1
-	result.append([reading])
+	result.append(reading)
 
 
 # -----------------
@@ -83,10 +83,10 @@ sublists = []
 sublist = []
 
 for val in result:
-	sublist.append(val[0])
-	if (not in_bounds and val[0] > 0.0):
+	sublist.append(val)
+	if (not in_bounds and val > 0.0):
 		in_bounds = True
-	elif (in_bounds and val[0] == 0.0):
+	elif (in_bounds and val == 0.0):
 		count += 1
 		in_bounds = False
 		if (count > num_peaks - 1):
@@ -136,24 +136,44 @@ for sub in sublists:
 
 longest = max(len(sub) for sub in sublists)
 
-finalresult = []
+final_result = []
 for i in range(longest):
 	sub_result = []
 	for j in range(len(sublists)):
 		sub_result.append(0 if len(sublists[j]) <= i else sublists[j][i])
-	finalresult.append(sub_result)
+	final_result.append(sub_result)
+
+# @description: Builds the final column that contains all result values.
+
+final_result_length = len(final_result)
+for i in range(len(result)):
+	if i < final_result_length:
+		sub_result = final_result[i]
+		sub_result.append(None)
+		sub_result.append(result[i])
+	else:
+		sub_result = []
+		for j in range(len(sublists)):
+			sub_result.append(None)
+		sub_result.append(None)
+		sub_result.append(result[i])
+		final_result.append(sub_result)
+
+# @description: Strips down filepath to contain just the filename.
 
 if '/' in filepath:
 	subpaths = filepath.split('/')
 	subpaths[-1] = 'output_' + subpaths[-1]
+	filepath = '/'.join(subpaths)
 elif '\\' in filepath:
 	subpaths = filepath.split('\\')
 	subpaths[-1] = 'output_' + subpaths[-1]
-
-filepath = '/'.join(subpaths)
+	filepath = '/'.join(subpaths)
+else:
+	filepath = 'output_' + filepath
 
 f = open(filepath, 'w+b')
 writer = csv.writer(f)
-writer.writerows(finalresult)
+writer.writerows(final_result)
 
 print 'Success! \nOutput file path: ' + filepath
