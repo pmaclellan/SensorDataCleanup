@@ -45,7 +45,6 @@ for reading in sensor_data:
 		if (reading < local_min):
 			local_min = reading
 	elif (in_bounds and reading > threshold):
-		print local_min
 		count += 1
 		in_bounds = False
 		if (count > num_peaks - 1):
